@@ -10,6 +10,7 @@ class App extends PureComponent {
 		teams: {},
     pichichis: [],
 		showModal: false,
+    isDescending: null
 	};
 
 	componentDidMount() {
@@ -24,7 +25,9 @@ class App extends PureComponent {
     })
     .then((players) => {
       this.setState({players});
-      this.fetchPichichis(players);
+      if (this.state.pichichis.length === 0) {
+		this.fetchPichichis(players);
+	}
     });
   }
 
@@ -86,11 +89,18 @@ class App extends PureComponent {
 		});
 	};
 
+  sortPichichis = () => {
+    this.setState(({isDescending, pichichis}) => ({
+      isDescending: !isDescending,
+      pichichis: pichichis.sort((a, b) => isDescending ? a.goals - b.goals : b.goals - a.goals)
+    }))
+  }
+
 	render() {
-		const {players, teams, showModal, pichichis} = this.state;
+		const {players, teams, showModal, pichichis, isDescending} = this.state;
 		return (
 			<React.Fragment>
-        {showModal && <Modal closeModal={() => this.handleModalVisibility(false)} pichichis={pichichis}></Modal>}
+        {showModal && <Modal closeModal={() => this.handleModalVisibility(false)} pichichis={pichichis} isDescending={isDescending} sortPichichis={this.sortPichichis}></Modal>}
 				<div className="App">
 					<header className="App-header">
 						<button

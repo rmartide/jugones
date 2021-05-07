@@ -32,6 +32,7 @@
 .modal-close-button {
     align-self: flex-start;
     background-color: white;
+    margin-right: 10px;
 }
 
 .modal-pichichi {
