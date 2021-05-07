@@ -2,6 +2,7 @@ import "./App.css";
 
 import React, {PureComponent} from "react";
 import Modal from "./components/modal/modal";
+import { cachePichichis, cachePlayers, cacheTeams, restorePichichis, restorePlayers, restoreTeams } from "./util/storage";
 const domain = "http://localhost:3001";
 
 class App extends PureComponent {
@@ -14,8 +15,16 @@ class App extends PureComponent {
 	};
 
 	componentDidMount() {
-		this.fetchPlayers();
-		this.fetchTeams();
+    if (!navigator.onLine) {
+      this.setState({
+        players: restorePlayers(),
+        teams: restoreTeams(),
+        pichichis: restorePichichis()
+       })
+    } else {
+      this.fetchPlayers();
+      this.fetchTeams();
+    }
 	}
 
   fetchPlayers() {
@@ -25,9 +34,10 @@ class App extends PureComponent {
     })
     .then((players) => {
       this.setState({players});
+	  cachePlayers(players);
       if (this.state.pichichis.length === 0) {
 		this.fetchPichichis(players);
-	}
+		}
     });
   }
 
@@ -37,8 +47,10 @@ class App extends PureComponent {
 				return response.json();
 			})
 			.then((teams) => {
+        const teamsTemp = this.getTeams(teams);
+        cacheTeams(teamsTemp);
 				this.setState({
-					teams: this.getTeams(teams),
+					teams: teamsTemp,
 				});
 			});
   }
@@ -49,8 +61,10 @@ class App extends PureComponent {
 				return response.json();
 			})
 			.then((pichichis) => {
+        const pichichisTemp = this.getPichichis(pichichis, players);
+        cachePichichis(pichichisTemp);
 				this.setState({
-					pichichis: this.getPichichis(pichichis, players),
+					pichichis: pichichisTemp,
 				});
 			});
   }
