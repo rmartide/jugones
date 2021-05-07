@@ -1,47 +1,87 @@
-import './App.css'
+import "./App.css";
 
-import React, { PureComponent } from 'react'
-const domain = 'http://localhost:3001'
+import React, {PureComponent} from "react";
+const domain = "http://localhost:3001";
 
 class App extends PureComponent {
-  state = {
-    players: []
-  }
+	state = {
+		players: [],
+		teams: {},
+	};
 
-  componentDidMount() {
-    fetch(`${domain}/players`)
-    .then(response => {
-      return response.json();
-    })
-    .then(players => {
-      this.setState({players});
-    });
-  }
+	componentDidMount() {
+		fetch(`${domain}/players`)
+			.then((response) => {
+				return response.json();
+			})
+			.then((players) => {
+				this.setState({players});
+			});
+		fetch(`${domain}/teams`)
+			.then((response) => {
+				return response.json();
+			})
+			.then((teams) => {
+				this.setState({
+					teams: this.getTeams(teams),
+				});
+			});
+	}
 
-  render() {
-    const { players } = this.state
+	getTeams(teams) {
+		const teamsTemp = {};
+		teams.forEach(
+			(team) => (teamsTemp[team.id] = team)
+		);
+		return teamsTemp;
+	}
 
-    return <div className="App">
-      <div className="App-players App-flex">
-        {/* 
+	render() {
+		const {players, teams} = this.state;
+		return (
+			<div className="App">
+					<h3>Los Jugadores</h3>
+				<div className="App-players">
+					{/* 
           TODO ejercicio 2
           Debes obtener los players en lugar de los equipos y pintar su nombre. 
           Borra todo el código que no sea necesario. Solo debe existir un título: Los jugadores
           y una lista con sus nombres. 
           ** Los comentarios de los ejercicios no los borres.
         */}
-        <h3>Los Jugadores</h3>
-        <ul>
-          {/* 
+						{/* 
             TODO ejercicio 3
             Vamos a pasar a darle diseño. Crea el diseño propuesto en el readme con los requerimientos que se necesite.
             Guiate por las imágenes.
            */}
-          {players.map(player => <li key={player.id}>{player.name}</li>)}
-        </ul>
-      </div>
-    </div>
-  }
+						{players.map((player) => (
+							<div className="App-player" key={player.id}>
+								<div className="App-player-content">
+									<div className="App-player-image App-flex">
+										<img src={player.img}></img>
+									</div>
+									<div className="App-player-text">
+										<span className="App-player-name">
+											{player.name}
+										</span>
+										<span className="App-player-position">
+											{player.position}
+										</span>
+										<span className="App-player-team">
+											{teams[player.teamId].name}
+										</span>
+									</div>
+								</div>
+								<img
+									className="App-team-shield"
+									src={`https:${teams[player.teamId].shield}`}
+								></img>
+							</div>
+						))}
+				</div>
+			</div>
+		);
+	}
 }
 
-export default App
+export default App;

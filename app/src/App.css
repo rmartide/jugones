@@ -1,19 +1,132 @@
 .App {
-  height: 100%;
-  min-height: 400px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
+	height: 100%;
+	min-height: 400px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: stretch;
 }
 
 .App-flex {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	justify-content: center;
 }
 
 .App-players {
-  flex-direction: column;
+	display: flex;
+	flex: 0 1 auto;
+	flex-flow: row wrap;
+	justify-content: center;
+}
+
+.App-player {
+	border: solid 1px grey;
+	border-radius: 10px;
+	min-width: 280px;
+	display: flex;
+	padding: 10px;
+	flex: 1 0 30%;
+	max-width: 400px;
+	margin: 30px;
+}
+
+.App-player-text {
+	align-self: center;
+}
+
+.App-player-content {
+	flex-direction: column;
+	display: flex;
+	align-items: center;
+	flex-grow: 1;
+	text-align: center;
+}
+
+.App-player-name {
+	font-size: 20px;
+}
+
+.App-player-position {
+	font-size: 18px;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
+.App-player-team {
+	font-size: 15px;
+	display: block;
+}
+
+.App-player-image {
+	border-radius: 50%;
+	width: 250px;
+	height: 250px;
+	position: relative;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+
+.App-player-image > img {
+	height: 250px;
+}
+
+.App-team-shield {
+	width: 35px;
+	height: 35px;
+	margin-left: auto;
+}
+
+.App-players ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+@media only screen and (max-width: 1024px) {
+	.App-player {
+		flex: 1 0 100%;
+		max-width: 80%;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	.App-player-content {
+		flex-direction: row;
+		display: flex;
+		text-align: left;
+	}
+
+	.App-player-name {
+		font-size: 15px;
+	}
+
+	.App-player-position {
+		font-size: 13px;
+		font-weight: bold;
+		margin-left: 5px;
+	}
+
+	.App-player-team {
+		font-size: 10px;
+		display: block;
+	}
+	.App-player {
+		flex: 1 0 100%;
+	}
+	.App-player-image {
+		width: 50px;
+		height: 50px;
+	}
+
+	.App-player-image > img {
+		height: 50px;
+	}
+
+	.App-player-text {
+		margin-left: 15px;
+	}
+
+	.App-team-shield {
+		width: 15px;
+		height: 15px;
+	}
 }
