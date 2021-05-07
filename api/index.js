@@ -236,7 +236,8 @@ app.get("/players", function (req, res) {
         name: player.name,
         position: POSITIONS_STRING[player.position],
         img: player.img ?? player.url ?? atleticoImages[player.id],
-        teamId: team.id
+        teamId: team.id,
+        id: player.id
       })
     })
   });

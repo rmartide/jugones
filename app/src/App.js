@@ -8,18 +8,28 @@ class App extends PureComponent {
 	state = {
 		players: [],
 		teams: {},
+    pichichis: [],
 		showModal: false,
 	};
 
 	componentDidMount() {
-		fetch(`${domain}/players`)
-			.then((response) => {
-				return response.json();
-			})
-			.then((players) => {
-				this.setState({players});
-			});
-		fetch(`${domain}/teams`)
+		this.fetchPlayers();
+		this.fetchTeams();
+	}
+
+  fetchPlayers() {
+    fetch(`${domain}/players`)
+    .then((response) => {
+      return response.json();
+    })
+    .then((players) => {
+      this.setState({players});
+      this.fetchPichichis(players);
+    });
+  }
+
+  fetchTeams() {
+    fetch(`${domain}/teams`)
 			.then((response) => {
 				return response.json();
 			})
@@ -28,7 +38,41 @@ class App extends PureComponent {
 					teams: this.getTeams(teams),
 				});
 			});
-	}
+  }
+
+  fetchPichichis(players) {
+    fetch(`${domain}/pichichis`)
+			.then((response) => {
+				return response.json();
+			})
+			.then((pichichis) => {
+				this.setState({
+					pichichis: this.getPichichis(pichichis, players),
+				});
+			});
+  }
+
+  getPichichis(pichichis, players) {
+    const playersTemp = {};
+    players.forEach(({name, id}) => {
+      playersTemp[id] = name;
+    })
+    return pichichis.map(({playerId, goals}) => ({
+      name: playersTemp[playerId],
+      goals: this.parseGoals(goals)
+    }))
+  }
+
+  parseGoals(goals) {
+    const tempGoals = Number(goals || 0);
+    let result = 0;
+    if(Number.isInteger(tempGoals)) {
+      result = tempGoals;
+    } else if(Number.isNaN(tempGoals) && goals.includes("goles")) {
+      result = Number(goals.split("goles")[0]);
+    } 
+    return result;
+  }
 
 	getTeams(teams) {
 		const teamsTemp = {};
@@ -43,10 +87,10 @@ class App extends PureComponent {
 	};
 
 	render() {
-		const {players, teams, showModal} = this.state;
+		const {players, teams, showModal, pichichis} = this.state;
 		return (
 			<React.Fragment>
-        {showModal && <Modal closeModal={() => this.handleModalVisibility(false)}></Modal>}
+        {showModal && <Modal closeModal={() => this.handleModalVisibility(false)} pichichis={pichichis}></Modal>}
 				<div className="App">
 					<header className="App-header">
 						<button
@@ -71,7 +115,7 @@ class App extends PureComponent {
             Guiate por las imágenes.
            */}
 						{players.map((player) => (
-							<div className="App-player" key={player.name}>
+							<div className="App-player" key={player.id}>
 								<div className="App-player-content">
 									<div className="App-player-image App-flex">
 										<img src={player.img}></img>

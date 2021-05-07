@@ -24,6 +24,7 @@
 	display: flex;
 	justify-content: space-evenly;
     align-items: center;
+    flex-direction: column;
     overflow: auto;
     margin-bottom: 20px;
 }
@@ -31,4 +32,8 @@
 .modal-close-button {
     align-self: flex-start;
     background-color: white;
+}
+
+.modal-pichichi {
+    margin-bottom: 10px;
 }
