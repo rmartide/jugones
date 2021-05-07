@@ -20,18 +20,27 @@
   align-items: center;
 }
 
-.App-pichichis-button {
-  margin-left:auto;
+.App-button {
   border-radius: 15px;
   height: 30px;
   border: 1px solid black;
-  margin-right: 30px;
   cursor: pointer;
+}
+
+.App-pichichis-button {
+  margin-left:auto;
+  margin-right: 30px;
 }
 
 .App-flex {
 	display: flex;
 	justify-content: center;
+}
+
+.App-center-content {
+  display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .App-players {
