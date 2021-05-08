@@ -1,0 +1,19 @@
+.transfer-button {
+    background-color: white;
+}
+
+.transfer-teams {
+    margin-bottom: 10px;
+}
+
+.transfer-players {
+    margin-bottom: 10px;
+}
+
+.transfer-money {
+    margin-bottom: 10px;
+}
+
+.transfer-result {
+    font-weight: bold;
+}

@@ -1,95 +1,105 @@
 import "./App.css";
 
 import React, {PureComponent} from "react";
-import Modal from "./components/modal/modal";
-import { cachePichichis, cachePlayers, cacheTeams, restorePichichis, restorePlayers, restoreTeams } from "./util/storage";
+import {
+	cachePichichis,
+	cachePlayers,
+	cacheTeams,
+	restorePichichis,
+	restorePlayers,
+	restoreTeams,
+} from "./util/storage";
+import PichichisModal from "./components/pichichis-modal/pichichis-modal";
+import TransfersModal from "./components/transfers-modal/transfers-modal";
 const domain = "http://localhost:3001";
 
 class App extends PureComponent {
 	state = {
 		players: [],
 		teams: {},
-    pichichis: [],
-		showModal: false,
-    isDescending: null
+		pichichis: [],
+		showPichichisModal: false,
+		showTransfersModal: false,
+		isDescending: null,
+		transferResult: null,
 	};
 
 	componentDidMount() {
-    if (!navigator.onLine) {
-      this.setState({
-        players: restorePlayers(),
-        teams: restoreTeams(),
-        pichichis: restorePichichis()
-       })
-    } else {
-      this.fetchPlayers();
-      this.fetchTeams();
-    }
+		if (!navigator.onLine) {
+			this.setState({
+				players: restorePlayers(),
+				teams: restoreTeams(),
+				pichichis: restorePichichis(),
+			});
+		} else {
+			this.fetchPlayers();
+			this.fetchTeams();
+		}
 	}
 
-  fetchPlayers() {
-    fetch(`${domain}/players`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((players) => {
-      this.setState({players});
-	  cachePlayers(players);
-      if (this.state.pichichis.length === 0) {
-		this.fetchPichichis(players);
-		}
-    });
-  }
+	fetchPlayers() {
+		fetch(`${domain}/players`)
+			.then((response) => {
+				return response.json();
+			})
+			.then((players) => {
+				this.setState({players});
+				cachePlayers(players);
+				if (this.state.pichichis.length === 0) {
+					this.fetchPichichis(players);
+				}
+			});
+	}
 
-  fetchTeams() {
-    fetch(`${domain}/teams`)
+	fetchTeams() {
+		fetch(`${domain}/teams`)
 			.then((response) => {
 				return response.json();
 			})
 			.then((teams) => {
-        const teamsTemp = this.getTeams(teams);
-        cacheTeams(teamsTemp);
+				const teamsTemp = this.getTeams(teams);
+				cacheTeams(teamsTemp);
 				this.setState({
 					teams: teamsTemp,
 				});
 			});
-  }
+	}
 
-  fetchPichichis(players) {
-    fetch(`${domain}/pichichis`)
+	fetchPichichis(players) {
+		fetch(`${domain}/pichichis`)
 			.then((response) => {
 				return response.json();
 			})
 			.then((pichichis) => {
-        const pichichisTemp = this.getPichichis(pichichis, players);
-        cachePichichis(pichichisTemp);
+				const pichichisTemp = this.getPichichis(pichichis, players);
+				cachePichichis(pichichisTemp);
 				this.setState({
 					pichichis: pichichisTemp,
 				});
 			});
-  }
+	}
 
-  getPichichis(pichichis, players) {
-    const playersTemp = {};
-    players.forEach(({name, id}) => {
-      playersTemp[id] = name;
-    })
-    return pichichis.map(({playerId, goals}) => ({
-      name: playersTemp[playerId],
-      goals: this.parseGoals(goals)
-    }))
-  }
+	getPichichis(pichichis, players) {
+		const playersTemp = {};
+		players.forEach(({name, id}) => {
+			playersTemp[id] = name;
+		});
+		return pichichis.map(({playerId, goals}) => ({
+			name: playersTemp[playerId],
+			goals: this.parseGoals(goals),
+		}));
+	}
 
-  parseGoals(goals) {
-    const tempGoals = Number(goals || 0);
-    let result = 0;
-    if(Number.isInteger(tempGoals)) {
-      result = tempGoals;
-    } else if(Number.isNaN(tempGoals) && goals.includes("goles")) {
-      result = Number(goals.split("goles")[0]);
-    } 
-    return result;
-  }
+	parseGoals(goals) {
+		const tempGoals = Number(goals || 0);
+		let result = 0;
+		if (Number.isInteger(tempGoals)) {
+			result = tempGoals;
+		} else if (Number.isNaN(tempGoals) && goals.includes("goles")) {
+			result = Number(goals.split("goles")[0]);
+		}
+		return result;
+	}
 
 	getTeams(teams) {
 		const teamsTemp = {};
@@ -97,29 +107,92 @@ class App extends PureComponent {
 		return teamsTemp;
 	}
 
-	handleModalVisibility = (show) => {
+	handleModalVisibility = (key, show) => {
 		this.setState({
-			showModal: show,
+			[key]: show,
 		});
+		if (!!this.state.transferResult) {
+			this.setState({
+				transferResult: null,
+			});
+		}
 	};
 
-  sortPichichis = () => {
-    this.setState(({isDescending, pichichis}) => ({
-      isDescending: !isDescending,
-      pichichis: pichichis.sort((a, b) => isDescending ? a.goals - b.goals : b.goals - a.goals)
-    }))
-  }
+	sortPichichis = () => {
+		this.setState(({isDescending, pichichis}) => ({
+			isDescending: !isDescending,
+			pichichis: pichichis.sort((a, b) =>
+				isDescending ? a.goals - b.goals : b.goals - a.goals
+			),
+		}));
+	};
+
+	transferPlayer = (teamId, playerId) => {
+		fetch(`${domain}/transfer`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({teamId, playerId}),
+		}).then((response) => {
+      return response.json();
+    })
+    .then((transferResult) => {
+      this.setState({
+        transferResult
+      })
+    });
+	};
 
 	render() {
-		const {players, teams, showModal, pichichis, isDescending} = this.state;
+		const {
+			players,
+			teams,
+			showPichichisModal,
+			pichichis,
+			isDescending,
+			showTransfersModal,
+      transferResult
+		} = this.state;
 		return (
 			<React.Fragment>
-        {showModal && <Modal closeModal={() => this.handleModalVisibility(false)} pichichis={pichichis} isDescending={isDescending} sortPichichis={this.sortPichichis}></Modal>}
+				{showPichichisModal && (
+					<PichichisModal
+						closeModal={() =>
+							this.handleModalVisibility(
+								"showPichichisModal",
+								false
+							)
+						}
+						pichichis={pichichis}
+						isDescending={isDescending}
+						sortPichichis={this.sortPichichis}
+					></PichichisModal>
+				)}
+				{showTransfersModal && (
+					<TransfersModal
+						closeModal={() =>
+							this.handleModalVisibility(
+								"showTransfersModal",
+								false
+							)
+						}
+						teams={teams}
+						players={players}
+						transferPlayer={this.transferPlayer}
+						transferResult={transferResult}
+					></TransfersModal>
+				)}
 				<div className="App">
 					<header className="App-header">
 						<button
 							className="App-pichichis-button App-button"
-							onClick={() => this.handleModalVisibility(true)}
+							onClick={() =>
+								this.handleModalVisibility(
+									"showPichichisModal",
+									true
+								)
+							}
 						>
 							Pichichis
 						</button>
@@ -139,7 +212,16 @@ class App extends PureComponent {
             Guiate por las imágenes.
            */}
 						{players.map((player) => (
-							<div className="App-player" key={player.id}>
+							<div
+								className="App-player"
+								key={player.id}
+								onClick={() =>
+									this.handleModalVisibility(
+										"showTransfersModal",
+										true
+									)
+								}
+							>
 								<div className="App-player-content">
 									<div className="App-player-image App-flex">
 										<img src={player.img}></img>
