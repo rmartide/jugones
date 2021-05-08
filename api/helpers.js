@@ -12,6 +12,16 @@ const getPlayer = (playerId, teams) =>  {
   return false
 }
 
+const removePlayerFromTeam = (playerId, teams) => {
+  var playerIndex
+  var team = teams.find(t => {
+    playerIndex = t.players.findIndex(p => p.id === playerId)
+    return playerIndex !== -1
+  })
+  team.players.splice(playerIndex, 1);
+}
+
 module.exports = {
-  getPlayer
+  getPlayer,
+  removePlayerFromTeam
 }

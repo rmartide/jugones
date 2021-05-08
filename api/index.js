@@ -292,7 +292,14 @@ app.post("/transfer", function (req, res) {
 	// TODO ejercicio 8
 	// añade el código para cambiar de equipo al jugador
 	// restar el precio de la transacción al equipo
+  helpers.removePlayerFromTeam(playerId, [
+		madrid,
+		barcelona,
+		atletico,
+	]);
 
+  team.players.push(player);
+  team.money -= player.price;
 	res.json({});
 });
 

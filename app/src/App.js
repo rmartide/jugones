@@ -141,6 +141,10 @@ class App extends PureComponent {
       this.setState({
         transferResult
       })
+      if(!transferResult.error) {
+        this.fetchTeams();
+        this.fetchPlayers();
+      }
     });
 	};
 
