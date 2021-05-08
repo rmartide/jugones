@@ -11,6 +11,8 @@ import {
 } from "./util/storage";
 import PichichisModal from "./components/pichichis-modal/pichichis-modal";
 import TransfersModal from "./components/transfers-modal/transfers-modal";
+import Player from "./components/player/player";
+import Header from "./components/header/header";
 const domain = "http://localhost:3001";
 
 class App extends PureComponent {
@@ -134,18 +136,19 @@ class App extends PureComponent {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({teamId, playerId}),
-		}).then((response) => {
-      return response.json();
-    })
-    .then((transferResult) => {
-      this.setState({
-        transferResult
-      })
-      if(!transferResult.error) {
-        this.fetchTeams();
-        this.fetchPlayers();
-      }
-    });
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((transferResult) => {
+				this.setState({
+					transferResult,
+				});
+				if (!transferResult.error) {
+					this.fetchTeams();
+					this.fetchPlayers();
+				}
+			});
 	};
 
 	render() {
@@ -156,7 +159,7 @@ class App extends PureComponent {
 			pichichis,
 			isDescending,
 			showTransfersModal,
-      transferResult
+			transferResult,
 		} = this.state;
 		return (
 			<React.Fragment>
@@ -187,72 +190,41 @@ class App extends PureComponent {
 						transferResult={transferResult}
 					></TransfersModal>
 				)}
+				{/* 
+					TODO ejercicio 2
+					Debes obtener los players en lugar de los equipos y pintar su nombre. 
+					Borra todo el código que no sea necesario. Solo debe existir un título: Los jugadores
+					y una lista con sus nombres. 
+					** Los comentarios de los ejercicios no los borres.
+					*/}
+				{/* 
+					TODO ejercicio 3
+					Vamos a pasar a darle diseño. Crea el diseño propuesto en el readme con los requerimientos que se necesite.
+					Guiate por las imágenes.
+					*/}
 				<div className="App">
-					<header className="App-header">
-						<button
-							className="App-pichichis-button App-button"
-							onClick={() =>
-								this.handleModalVisibility(
-									"showPichichisModal",
-									true
-								)
-							}
-						>
-							Pichichis
-						</button>
-					</header>
+					<Header
+						showModal={() =>
+							this.handleModalVisibility(
+								"showPichichisModal",
+								true
+							)
+						}
+					></Header>
 					<h3>Los Jugadores</h3>
 					<div className="App-players">
-						{/* 
-          TODO ejercicio 2
-          Debes obtener los players en lugar de los equipos y pintar su nombre. 
-          Borra todo el código que no sea necesario. Solo debe existir un título: Los jugadores
-          y una lista con sus nombres. 
-          ** Los comentarios de los ejercicios no los borres.
-        */}
-						{/* 
-            TODO ejercicio 3
-            Vamos a pasar a darle diseño. Crea el diseño propuesto en el readme con los requerimientos que se necesite.
-            Guiate por las imágenes.
-           */}
 						{players.map((player) => (
-							<div
-								className="App-player"
+							<Player
 								key={player.id}
-								onClick={() =>
+								player={player}
+								team={teams[player.teamId]}
+								showModal={() =>
 									this.handleModalVisibility(
 										"showTransfersModal",
 										true
 									)
 								}
-							>
-								<div className="App-player-content">
-									<div className="App-player-image App-flex">
-										<img src={player.img}></img>
-									</div>
-									<div className="App-player-text">
-										<span className="App-player-name">
-											{player.name}
-										</span>
-										<span className="App-player-position">
-											{player.position}
-										</span>
-										{teams[player.teamId] && (
-											<span className="App-player-team">
-												{teams[player.teamId].name}
-											</span>
-										)}
-									</div>
-								</div>
-								{teams[player.teamId] && (
-									<img
-										className="App-team-shield"
-										src={`https:${
-											teams[player.teamId].shield
-										}`}
-									></img>
-								)}
-							</div>
+							></Player>
 						))}
 					</div>
 				</div>
